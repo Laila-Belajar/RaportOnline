@@ -9,10 +9,7 @@
                   background-color: white; /* Ensure the iframe has a white background */
                 }
 
-                .view-section { display: none !important; }
-.view-section.active { display: block !important; }
-
-
+                
               </style>
                         </head>
                         <body>
@@ -60,6 +57,11 @@
     .leger-table th { font-size: 0.7rem; padding: 4px 2px; text-align: center; background: #f8f9fa; }
     .leger-table td { padding: 3px 2px; text-align: center; font-size: 0.72rem; }
     .leger-table .nama-col { text-align: left; font-weight: 600; min-width: 150px; position: sticky; left: 0; background: white; z-index: 1; }
+    .leger-table .peringkat-col { font-weight: bold; background: #fff3cd; min-width: 50px; }
+    .leger-table .peringkat-1 { background: #ffd700 !important; color: #000; }
+    .leger-table .peringkat-2 { background: #e0e0e0 !important; color: #000; }
+    .leger-table .peringkat-3 { background: #cd7f32 !important; color: #fff; }
+    .leger-table .rata-col { font-weight: bold; background: #d4edda; min-width: 60px; }
   </style>
 </head>
 <body>
@@ -237,13 +239,12 @@
         </div>
       </div>
 
-      <!-- PERBAIKAN: Menu Cetak Leger -->
       <div id="content-leger" class="sub-view" style="display:none;">
         <div class="card shadow-sm p-4 mb-3">
           <h5 class="mb-3"><i class="fas fa-table me-2 text-success"></i>Cetak Leger</h5>
           <div class="alert alert-info py-2 small mb-3">
             <i class="fas fa-info-circle me-1"></i>
-            <small>Leger adalah rekap nilai semua siswa dalam satu kelas untuk semua mata pelajaran dalam format tabel.</small>
+            <small>Leger adalah rekap nilai semua siswa dalam satu kelas untuk semua mata pelajaran dalam format tabel. Kolom <b>Peringkat</b> dihitung berdasarkan rata-rata nilai tertinggi.</small>
           </div>
           <div class="row g-3 mb-4">
             <div class="col-md-3"><label class="form-label">Kelas</label><select id="legerKelas" class="form-select"></select></div>
@@ -1375,7 +1376,7 @@
       doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
       doc.text('A. NILAI DAN KETERCAPAIAN KOMPETENSI', 20, currentY + 20); currentY += 36;
       doc.autoTable({
-        head: [['No', 'Mata Pelajaran', 'Nilai Akhir', 'Ketercapaan Kompetensi']],
+        head: [['No', 'Mata Pelajaran', 'Nilai Akhir', 'Ketercapaian Kompetensi']],
         body: dataForPdf.raportNilai, startY: currentY - 2, theme: 'grid',
         margin: { left: 20, right: 20, bottom: 60 }, tableWidth: 'auto',
         headStyles: { fillColor: [120, 200, 130], fontSize: 11, halign: 'center', cellPadding: 5 },
@@ -1529,7 +1530,7 @@
       } catch (e) { console.error(e); Swal.fire('Error', e.message, 'error'); }
     }
 
-    // ====== FITUR BARU: Cetak Leger ======
+    // ====== FITUR: Cetak Leger dengan Kolom Peringkat ======
     async function loadLegerDropdown() {
       if(kelasCache.length===0) kelasCache = await callGAS('getKelasData');
       const s = document.getElementById('legerKelas');
@@ -1567,25 +1568,11 @@
         // Filter mapel yang bukan ekskul untuk leger
         const mapelUntukLeger = mapelCache.filter(m => m.kategori !== 'Ekstrakurikuler');
         
-        // Build header
-        let headerHtml = '<tr><th rowspan="2" style="vertical-align:middle;">No</th><th rowspan="2" style="vertical-align:middle;">Nama Siswa</th>';
-        headerHtml += `<th colspan="${mapelUntukLeger.length + 1}" style="background:#d4edda;">Nilai per Mata Pelajaran</th>`;
-        headerHtml += '<th rowspan="2" style="vertical-align:middle;">Rata-rata</th></tr>';
-        headerHtml += '<tr>';
-        mapelUntukLeger.forEach(m => {
-          headerHtml += `<th title="${m.nama_mapel}">${m.nama_mapel.substring(0, 8)}</th>`;
-        });
-        headerHtml += '<th style="background:#fff3cd;">Rata²</th></tr>';
-        
-        document.getElementById('theadLeger').innerHTML = headerHtml;
-        
-        // Build body
-        let bodyHtml = '';
-        siswaKelas.forEach((s, idx) => {
-          bodyHtml += `<tr><td class="text-center">${idx+1}</td><td class="nama-col">${s.nama}</td>`;
-          
+        // PERBAIKAN: Hitung rata-rata per siswa terlebih dahulu untuk menentukan peringkat
+        const siswaDenganRata = siswaKelas.map(s => {
           let totalRata = 0;
           let countRata = 0;
+          const nilaiPerMapel = {};
           
           mapelUntukLeger.forEach(m => {
             const nilaiSiswa = nilaiData.filter(n => 
@@ -1602,19 +1589,102 @@
                   if(n['tp'+i]) { total += Number(n['tp'+i]); count++; }
                 }
               });
-              const rata = count > 0 ? Math.round(total/count) : '-';
-              if(rata !== '-') {
+              const rata = count > 0 ? Math.round(total/count) : null;
+              nilaiPerMapel[m.id_mapel] = rata;
+              if(rata !== null) {
                 totalRata += rata;
                 countRata++;
               }
-              bodyHtml += `<td>${rata}</td>`;
             } else {
-              bodyHtml += '<td>-</td>';
+              nilaiPerMapel[m.id_mapel] = null;
             }
           });
           
-          const rataAkhir = countRata > 0 ? Math.round(totalRata/countRata) : '-';
-          bodyHtml += `<td style="background:#fff3cd; font-weight:bold;">${rataAkhir}</td></tr>`;
+          const rataAkhir = countRata > 0 ? Math.round(totalRata/countRata) : null;
+          
+          return {
+            siswa: s,
+            nilaiPerMapel: nilaiPerMapel,
+            rataAkhir: rataAkhir
+          };
+        });
+        
+        // PERBAIKAN: Urutkan berdasarkan rata-rata tertinggi untuk menentukan peringkat
+        // Siswa dengan rata-rata null (tidak ada nilai) akan berada di peringkat terakhir
+        const sortedForRank = [...siswaDenganRata].sort((a, b) => {
+          if (a.rataAkhir === null && b.rataAkhir === null) return 0;
+          if (a.rataAkhir === null) return 1;
+          if (b.rataAkhir === null) return -1;
+          return b.rataAkhir - a.rataAkhir;
+        });
+        
+        // PERBAIKAN: Assign peringkat (handling untuk nilai sama - ranking paralel)
+        const peringkatMap = new Map();
+        let currentRank = 1;
+        for (let i = 0; i < sortedForRank.length; i++) {
+          const item = sortedForRank[i];
+          if (item.rataAkhir === null) {
+            peringkatMap.set(item.siswa.id_siswa, '-');
+          } else {
+            // Cek apakah ada siswa sebelumnya dengan nilai yang sama
+            if (i > 0 && sortedForRank[i-1].rataAkhir === item.rataAkhir) {
+              // Ranking paralel - sama dengan siswa sebelumnya
+              peringkatMap.set(item.siswa.id_siswa, peringkatMap.get(sortedForRank[i-1].siswa.id_siswa));
+            } else {
+              peringkatMap.set(item.siswa.id_siswa, currentRank);
+            }
+            currentRank++;
+          }
+        }
+        
+        // Build header tabel
+        let headerHtml = '<tr>';
+        headerHtml += '<th rowspan="2" style="vertical-align:middle; background:#e7f1ff;">No</th>';
+        headerHtml += '<th rowspan="2" style="vertical-align:middle; background:#e7f1ff;">Nama Siswa</th>';
+        // Kolom Peringkat di sini (setelah Nama Siswa)
+        headerHtml += '<th rowspan="2" style="vertical-align:middle; background:#fff3cd; color:#000; font-weight:bold;" title="Peringkat berdasarkan rata-rata nilai">🏆<br>Rank</th>';
+        headerHtml += `<th colspan="${mapelUntukLeger.length}" style="background:#d4edda;">Nilai per Mata Pelajaran</th>`;
+        headerHtml += '<th rowspan="2" style="vertical-align:middle; background:#d4edda;">Rata-rata</th></tr>';
+        headerHtml += '<tr>';
+        mapelUntukLeger.forEach(m => {
+          headerHtml += `<th title="${m.nama_mapel}">${m.nama_mapel.substring(0, 8)}</th>`;
+        });
+        headerHtml += '</tr>';
+        
+        document.getElementById('theadLeger').innerHTML = headerHtml;
+        
+        // Build body - tampilkan sesuai urutan nama (bukan peringkat)
+        let bodyHtml = '';
+        siswaDenganRata.forEach((item, idx) => {
+          const s = item.siswa;
+          const peringkat = peringkatMap.get(s.id_siswa);
+          
+          // Tentukan class untuk peringkat (medali emas/perak/perunggu)
+          let peringkatClass = 'peringkat-col';
+          let peringkatDisplay = peringkat;
+          if (peringkat === 1) {
+            peringkatClass += ' peringkat-1';
+            peringkatDisplay = '🥇 1';
+          } else if (peringkat === 2) {
+            peringkatClass += ' peringkat-2';
+            peringkatDisplay = '🥈 2';
+          } else if (peringkat === 3) {
+            peringkatClass += ' peringkat-3';
+            peringkatDisplay = '🥉 3';
+          }
+          
+          bodyHtml += `<tr>`;
+          bodyHtml += `<td class="text-center">${idx+1}</td>`;
+          bodyHtml += `<td class="nama-col">${s.nama}</td>`;
+          bodyHtml += `<td class="${peringkatClass}">${peringkatDisplay}</td>`;
+          
+          mapelUntukLeger.forEach(m => {
+            const nilai = item.nilaiPerMapel[m.id_mapel];
+            bodyHtml += `<td>${nilai !== null ? nilai : '-'}</td>`;
+          });
+          
+          const rataDisplay = item.rataAkhir !== null ? item.rataAkhir : '-';
+          bodyHtml += `<td class="rata-col">${rataDisplay}</td></tr>`;
         });
         
         document.getElementById('tbodyLeger').innerHTML = bodyHtml;
@@ -1636,10 +1706,9 @@
       
       if(!kelas) { Swal.fire('Info','Pilih Kelas terlebih dahulu','info'); return; }
       
-      const thead = document.getElementById('theadLeger');
       const tbody = document.getElementById('tbodyLeger');
       
-      if(!thead.innerHTML || !tbody.innerHTML) {
+      if(!tbody.innerHTML) {
         Swal.fire('Info','Tampilkan data leger terlebih dahulu','info');
         return;
       }
@@ -1663,7 +1732,8 @@
         doc.text(`Kelas: ${kelas} | Semester: ${semester === '1' ? 'Ganjil' : 'Genap'} | Tahun Pelajaran: ${tp}`, pageWidth / 2, 48, { align: 'center' });
         
         // Build table data
-        const headerRow1 = ['No', 'Nama Siswa'];
+        // PERBAIKAN: Tambahkan kolom Peringkat
+        const headerRow1 = ['No', 'Nama Siswa', 'Rank'];
         mapelUntukLeger.forEach(m => headerRow1.push(m.nama_mapel));
         headerRow1.push('Rata-rata');
         
@@ -1672,21 +1742,20 @@
         rows.forEach(row => {
           const cells = row.querySelectorAll('td');
           const rowData = [];
-          cells.forEach((cell, idx) => {
-            if(idx === 1) {
-              rowData.push(cell.textContent.trim());
-            } else {
-              rowData.push(cell.textContent.trim());
-            }
+          cells.forEach((cell) => {
+            let text = cell.textContent.trim();
+            // Bersihkan emoji medali dari teks peringkat
+            text = text.replace(/[🥇🥈🥉]/g, '').trim();
+            rowData.push(text);
           });
           bodyData.push(rowData);
         });
         
         // Column widths
-        const colWidths = [25, 150];
-        const mapelWidth = (pageWidth - 80 - 25 - 150 - 60) / mapelUntukLeger.length;
-        mapelUntukLeger.forEach(() => colWidths.push(Math.max(mapelWidth, 45)));
-        colWidths.push(60);
+        const colWidths = [25, 140, 35]; // No, Nama, Rank
+        const mapelWidth = (pageWidth - 80 - 25 - 140 - 35 - 55) / mapelUntukLeger.length;
+        mapelUntukLeger.forEach(() => colWidths.push(Math.max(mapelWidth, 40)));
+        colWidths.push(55); // Rata-rata
         
         doc.autoTable({
           head: [headerRow1],
@@ -1708,8 +1777,28 @@
           },
           columnStyles: {
             0: { halign: 'center', cellWidth: 25 },
-            1: { halign: 'left', cellWidth: 150 },
-            [headerRow1.length - 1]: { halign: 'center', cellWidth: 60, fontStyle: 'bold', fillColor: [255, 243, 205] }
+            1: { halign: 'left', cellWidth: 140 },
+            2: { halign: 'center', cellWidth: 35, fontStyle: 'bold', fillColor: [255, 243, 205] }, // Kolom Rank
+            [headerRow1.length - 1]: { halign: 'center', cellWidth: 55, fontStyle: 'bold', fillColor: [212, 237, 205] } // Rata-rata
+          },
+          // PERBAIKAN: Styling khusus untuk peringkat 1, 2, 3
+          didParseCell: function(data) {
+            if (data.section === 'body' && data.column.index === 2) {
+              const rank = parseInt(data.cell.text[0]);
+              if (rank === 1) {
+                data.cell.styles.fillColor = [255, 215, 0]; // Emas
+                data.cell.styles.textColor = [0, 0, 0];
+                data.cell.styles.fontStyle = 'bold';
+              } else if (rank === 2) {
+                data.cell.styles.fillColor = [224, 224, 224]; // Perak
+                data.cell.styles.textColor = [0, 0, 0];
+                data.cell.styles.fontStyle = 'bold';
+              } else if (rank === 3) {
+                data.cell.styles.fillColor = [205, 127, 50]; // Perunggu
+                data.cell.styles.textColor = [255, 255, 255];
+                data.cell.styles.fontStyle = 'bold';
+              }
+            }
           },
           didDrawPage: function(data) {
             // Footer
@@ -1757,7 +1846,11 @@
 
 
               <script>
-                              
+                              // 1. Hitung rata-rata per siswa
+// 2. Urutkan siswa berdasarkan rata-rata tertinggi
+// 3. Assign peringkat dengan handling ranking paralel (nilai sama)
+
+
               </script>
                         </body>
                         </html>
