@@ -10,6 +10,8 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <!-- SheetJS untuk generate Excel di client -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
   <style>
     body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
@@ -239,7 +241,7 @@
   <div class="modal fade" id="modalMapel"><div class="modal-dialog"><div class="modal-content"><form id="formMapel"><input type="hidden" name="id_mapel" id="id_mapel"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Form Mapel</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-2"><label class="form-label">Kode Mapel</label><input type="text" class="form-control text-uppercase" name="kode_mapel" id="m_kode_mapel" required></div><div class="mb-2"><label class="form-label">Nama Mata Pelajaran</label><input type="text" class="form-control" name="nama_mapel" id="m_nama_mapel" required></div><div class="mb-2"><label class="form-label">Kategori</label><select class="form-select" name="kategori" id="m_kategori"><option value="Umum">Umum</option><option value="Mulok">Mulok</option><option value="Ekstrakurikuler">Ekstrakurikuler</option></select></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div></form></div></div></div>
   <div class="modal fade" id="modalTP"><div class="modal-dialog"><div class="modal-content"><form id="formTP"><input type="hidden" name="id_tp" id="id_tp"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Form TP</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label fw-bold">Mata Pelajaran</label><select class="form-select" name="id_mapel" id="t_id_mapel" required></select></div><label class="form-label fw-bold">Deskripsi TP</label><div id="tp-container"><div class="input-group mb-2 tp-item"><input type="text" class="form-control" name="deskripsi_tp" placeholder="TP ke-1" required><button class="btn btn-outline-primary" type="button" onclick="addTPField()"><i class="fas fa-plus"></i></button></div></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div></form></div></div></div>
   <div class="modal fade" id="modalSiswa"><div class="modal-dialog modal-lg"><div class="modal-content"><form id="formSiswa"><input type="hidden" name="id_siswa" id="id_siswa"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Form Siswa</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><h6 class="text-primary border-bottom pb-1 mb-3"><i class="fas fa-id-card me-1"></i> Data Peserta Didik</h6><div class="row g-2"><div class="col-md-5 mb-2"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" name="nama" id="f_nama" required></div><div class="col-md-3 mb-2"><label class="form-label">NISN</label><input type="text" class="form-control" name="nisn" id="f_nisn" required></div><div class="col-md-2 mb-2"><label class="form-label">NIS</label><input type="text" class="form-control" name="nis" id="f_nis" required></div><div class="col-md-2 mb-2"><label class="form-label">Kelas</label><select class="form-select" name="kelas" id="f_kelas" required></select></div><div class="col-md-4 mb-2"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" name="tempat_lahir" id="f_tempat_lahir"></div><div class="col-md-3 mb-2"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" name="tanggal_lahir" id="f_tanggal_lahir"></div><div class="col-md-2 mb-2"><label class="form-label">Jenis Kelamin</label><select class="form-select" name="jenis_kelamin" id="f_jenis_kelamin"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div><div class="col-md-3 mb-2"><label class="form-label">Agama</label><input type="text" class="form-control" name="agama" id="f_agama"></div><div class="col-md-5 mb-2"><label class="form-label">Pendidikan Sebelumnya</label><input type="text" class="form-control" name="pendidikan_sebelumnya" id="f_pendidikan_sebelumnya"></div><div class="col-md-7 mb-2"><label class="form-label">Alamat Siswa</label><input type="text" class="form-control" name="alamat_siswa" id="f_alamat_siswa"></div></div><h6 class="text-primary border-bottom pb-1 mb-3 mt-3"><i class="fas fa-users me-1"></i> Data Orang Tua</h6><div class="row g-2"><div class="col-md-4 mb-2"><label class="form-label">Nama Ayah</label><input type="text" class="form-control" name="nama_ayah" id="f_nama_ayah"></div><div class="col-md-4 mb-2"><label class="form-label">Pekerjaan Ayah</label><input type="text" class="form-control" name="pekerjaan_ayah" id="f_pekerjaan_ayah"></div><div class="col-md-4 mb-2"><label class="form-label">Nama Ibu</label><input type="text" class="form-control" name="nama_ibu" id="f_nama_ibu"></div><div class="col-md-4 mb-2"><label class="form-label">Pekerjaan Ibu</label><input type="text" class="form-control" name="pekerjaan_ibu" id="f_pekerjaan_ibu"></div><div class="col-md-8 mb-2"><label class="form-label">Alamat Orang Tua</label><input type="text" class="form-control" name="alamat_orang_tua" id="f_alamat_orang_tua"></div></div><h6 class="text-primary border-bottom pb-1 mb-3 mt-3"><i class="fas fa-user-shield me-1"></i> Wali Peserta Didik</h6><div class="row g-2"><div class="col-md-4 mb-2"><label class="form-label">Nama Wali</label><input type="text" class="form-control" name="nama_wali" id="f_nama_wali"></div><div class="col-md-4 mb-2"><label class="form-label">Pekerjaan Wali</label><input type="text" class="form-control" name="pekerjaan_wali" id="f_pekerjaan_wali"></div><div class="col-md-4 mb-2"><label class="form-label">Alamat Wali</label><input type="text" class="form-control" name="alamat_wali" id="f_alamat_wali"></div></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div></form></div></div></div>
-  <div class="modal fade" id="modalImport"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-warning text-dark"><h5 class="modal-title">Import Nilai</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><input type="file" class="form-control" id="importFile" accept=".csv,.xlsx,.xls"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-warning fw-bold" onclick="processImport()">Proses</button></div></div></div></div>
+  <div class="modal fade" id="modalImport"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-warning text-dark"><h5 class="modal-title">Import Nilai</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="alert alert-info py-2 small"><i class="fas fa-info-circle me-1"></i> <strong>Panduan Import Nilai:</strong><br>1. Klik tombol <b class="text-primary"><i class="fas fa-file-excel"></i> Download Template</b> di menu Input Nilai (setelah pilih Kelas & Mapel)<br>2. Isi nilai di kolom TP-1, TP-2, dst (0-100)<br>3. Upload file Excel yang sudah diisi di bawah ini<br><br><small class="text-danger"><b>Catatan:</b> Jangan ubah kolom NISN dan header, karena digunakan untuk mencocokkan data.</small></div><div class="mb-3"><label class="form-label fw-bold">Pilih File Excel (.xlsx)</label><input type="file" class="form-control" id="importFile" accept=".xlsx,.xls"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-warning fw-bold" onclick="processImport()"><i class="fas fa-upload me-1"></i> Proses</button></div></div></div></div>
   <div class="modal fade" id="modalImportSiswa"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-warning text-dark"><h5 class="modal-title"><i class="fas fa-file-import me-2"></i>Import Data Siswa</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="alert alert-info py-2 small"><i class="fas fa-info-circle me-1"></i> <strong>Cara Import:</strong><br>1. Klik tombol <b>"Download Template"</b> untuk mendapatkan format Excel<br>2. Isi data siswa di file Excel sesuai format<br>3. Upload file Excel yang sudah diisi di bawah ini</div><div class="d-grid mb-3"><button class="btn btn-outline-primary" onclick="downloadTemplateSiswa()"><i class="fas fa-download me-1"></i> Download Template Excel</button></div><div class="mb-3"><label class="form-label fw-bold">Pilih File Excel/CSV</label><input type="file" class="form-control" id="importSiswaFile" accept=".csv,.xlsx,.xls"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-warning fw-bold" onclick="processImportSiswa()"><i class="fas fa-upload me-1"></i> Proses Import</button></div></div></div></div>
 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -253,7 +255,7 @@
 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxjAf0Up405I53KSLrb7LbazdCmWEU8MDZ8VA7O-hX1toydER2thbQpAj6liuWO0Zkt/exec"; 
     
-    let mapelCache = [], siswaCache = [], kelasCache = [], tpCache = [], absenCache = [], userCache = [], settingsCache = {}, raportCache = [];
+    let mapelCache = [], siswaCache = [], kelasCache = [], tpCache = [], absenCache = [], userCache = [], settingsCache = {}, raportCache = [], nilaiCache = [];
     let logoBase64Cache = null;
     
     function escJs(str) { return String(str||'').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
@@ -418,7 +420,94 @@
     async function loadDropdownKelas(selectId) { if(kelasCache.length===0) kelasCache = await callGAS('getKelasData'); const s = document.getElementById(selectId); s.innerHTML='<option value="">Pilih Kelas</option>'; kelasCache.forEach(k=>s.innerHTML+=`<option value="${k.nama_kelas}">${k.nama_kelas}</option>`); }
     async function loadSiswa() { loadCRUD('tableSiswa', 'getSiswaData', [{data:'id_siswa'},{data:'nisn'},{data:'nis'},{data:'nama'},{data:'kelas'},{data:null, render:(d,t,r)=>`<button class="btn btn-sm btn-warning me-1" onclick="editSiswa('${r.id_siswa}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteItem('deleteSiswa','${r.id_siswa}','${escJs(r.nama)}')"><i class="fas fa-trash"></i></button>`}]); }
     function showImportSiswaModal() { new bootstrap.Modal(document.getElementById('modalImportSiswa')).show(); }
-    function downloadTemplateSiswa() { Swal.showLoading(); callGAS('downloadTemplateSiswa').then(res => { if(res.success) { window.open(res.url, '_blank'); Swal.close(); } else Swal.fire('Gagal', res.message, 'error'); }); }
+    
+    // ====== DOWNLOAD TEMPLATE SISWA (Generate Excel di Client) ======
+    async function downloadTemplateSiswa() {
+      Swal.fire({ title: 'Mempersiapkan Template...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      try {
+        if (typeof XLSX === 'undefined') {
+          Swal.fire('Error', 'Library Excel belum termuat. Silakan refresh halaman.', 'error');
+          return;
+        }
+        
+        // Ambil data kelas untuk referensi
+        if (kelasCache.length === 0) kelasCache = await callGAS('getKelasData');
+        
+        const wb = XLSX.utils.book_new();
+        
+        // Sheet info
+        const infoData = [
+          ['TEMPLATE IMPORT DATA SISWA'],
+          ['SD Negeri 1 Kalibening'],
+          [''],
+          ['PETUNJUK PENGISIAN:'],
+          ['1. Jangan ubah baris header (baris ke-6)'],
+          ['2. Jangan ubah kolom NISN (kolom B)'],
+          ['3. Isi data siswa mulai baris ke-7'],
+          ['4. Jenis Kelamin: L untuk Laki-laki, P untuk Perempuan'],
+          ['5. Tanggal Lahir format: YYYY-MM-DD (contoh: 2018-12-08)'],
+          ['6. Simpan file sebelum diupload'],
+          [''],
+          ['DAFTAR KELAS TERSEDIA:'],
+          ...kelasCache.map(k => ['- ' + k.nama_kelas])
+        ];
+        const wsInfo = XLSX.utils.aoa_to_sheet(infoData);
+        wsInfo['!cols'] = [{ wch: 60 }];
+        XLSX.utils.book_append_sheet(wb, wsInfo, 'Petunjuk');
+        
+        // Sheet data siswa
+        const headerData = [['NO', 'NISN', 'NIS', 'NAMA LENGKAP', 'KELAS', 'TEMPAT LAHIR', 'TANGGAL LAHIR', 'JENIS KELAMIN', 'AGAMA', 'PENDIDIKAN SEBELUMNYA', 'ALAMAT SISWA', 'NAMA AYAH', 'PEKERJAAN AYAH', 'NAMA IBU', 'PEKERJAAN IBU', 'ALAMAT ORANG TUA', 'NAMA WALI', 'PEKERJAAN WALI', 'ALAMAT WALI']];
+        const wsData = XLSX.utils.aoa_to_sheet(headerData);
+        
+        // Styling header
+        const range = XLSX.utils.decode_range(wsData['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const address = XLSX.utils.encode_col(C) + "1";
+          if (!wsData[address]) continue;
+          wsData[address].s = {
+            fill: { fgColor: { rgb: "0D6EFD" } },
+            font: { bold: true, color: { rgb: "FFFFFF" }, sz: 11 },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+        }
+        
+        wsData['!cols'] = [
+          { wch: 5 }, { wch: 15 }, { wch: 12 }, { wch: 30 }, { wch: 12 },
+          { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 25 },
+          { wch: 35 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 20 },
+          { wch: 35 }, { wch: 25 }, { wch: 20 }, { wch: 35 }
+        ];
+        
+        // Contoh data
+        XLSX.utils.sheet_add_aoa(wsData, [
+          [1, '0012345678', '1001', 'Contoh Nama Siswa', '1A', 'Kalibening', '2018-05-15', 'L', 'Islam', 'PAUD Pelita', 'Jl. Merdeka No. 1', 'Budi Santoso', 'PNS', 'Siti Aminah', 'IRT', 'Jl. Merdeka No. 1', '', '', '']
+        ], { origin: 'A2' });
+        
+        XLSX.utils.book_append_sheet(wb, wsData, 'Data Siswa');
+        
+        const fileName = 'Template_Import_Data_Siswa.xlsx';
+        XLSX.writeFile(wb, fileName);
+        
+        Swal.close();
+        Swal.fire({
+          icon: 'success',
+          title: 'Template Berhasil Diunduh',
+          html: 'File <b>' + fileName + '</b> telah diunduh.<br>Silakan isi data siswa di sheet <b>"Data Siswa"</b>.',
+          timer: 3500,
+          showConfirmButton: false
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire('Error', 'Gagal membuat template: ' + err.message, 'error');
+      }
+    }
+    
     async function processImportSiswa() { const fileInput = document.getElementById('importSiswaFile'); if (!fileInput.files[0]) { Swal.fire('Info', 'Pilih file terlebih dahulu', 'info'); return; } Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); const file = fileInput.files[0]; const reader = new FileReader(); reader.onload = async function(e) { const base64 = e.target.result.split(',')[1]; const res = await callGAS('importSiswa', base64, file.type, file.name); if (res.success) { Swal.fire('Berhasil', res.message, 'success'); bootstrap.Modal.getInstance(document.getElementById('modalImportSiswa')).hide(); loadSiswa(); } else Swal.fire('Gagal', res.message, 'error'); }; reader.readAsDataURL(file); }
 
     async function loadNilaiDropdown() { if(kelasCache.length===0) kelasCache = await callGAS('getKelasData'); const s = document.getElementById('filterKelas'); s.innerHTML='<option value="">Pilih Kelas</option>'; kelasCache.forEach(k=>s.innerHTML+=`<option value="${k.nama_kelas}">${k.nama_kelas}</option>`); document.getElementById('filterTP').value = settingsCache['Tahun Pelajaran'] || ''; await loadDropdownMapel('filterMapel'); }
@@ -432,6 +521,7 @@
       Swal.showLoading(); 
       if(siswaCache.length===0) siswaCache = await callGAS('getSiswaData'); 
       const nilaiData = await callGAS('getNilaiData'); 
+      nilaiCache = nilaiData;
       tpCache = await callGAS('getTPData'); 
       mapelCache = await callGAS('getMapelData');
       const siswaKelas = siswaCache.filter(s=>s.kelas===kelas); 
@@ -473,9 +563,406 @@
       Swal.close(); 
     }
     
-    function downloadTemplate() { const kelas = document.getElementById('filterKelas').value; const semester = document.getElementById('filterSemester').value; const tp = document.getElementById('filterTP').value; const idMapel = document.getElementById('filterMapel').value; if(!kelas || !idMapel) { Swal.fire('Info','Pilih Kelas dan Mapel','info'); return; } Swal.showLoading(); callGAS('downloadTemplateNilai', kelas, semester, tp, idMapel).then(res => { if(res.success) { window.open(res.url, '_blank'); Swal.close(); } else Swal.fire('Gagal', res.message, 'error'); }); }
-    function showImportModal() { new bootstrap.Modal(document.getElementById('modalImport')).show(); }
-    async function processImport() { const fileInput = document.getElementById('importFile'); if (!fileInput.files[0]) { Swal.fire('Info', 'Pilih file terlebih dahulu', 'info'); return; } Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); const file = fileInput.files[0]; const reader = new FileReader(); reader.onload = async function(e) { const base64 = e.target.result.split(',')[1]; const semester = document.getElementById('filterSemester').value; const tp = document.getElementById('filterTP').value; const idMapel = document.getElementById('filterMapel').value; const res = await callGAS('importNilai', base64, file.type, file.name, semester, tp, idMapel); if (res.success) { Swal.fire('Berhasil', res.message, 'success'); bootstrap.Modal.getInstance(document.getElementById('modalImport')).hide(); loadNilaiTable(); } else Swal.fire('Gagal', res.message, 'error'); }; reader.readAsDataURL(file); }
+    // ====== DOWNLOAD TEMPLATE NILAI (Generate Excel di Client dengan SheetJS) ======
+    async function downloadTemplate() {
+      const kelas = document.getElementById('filterKelas').value;
+      const semester = document.getElementById('filterSemester').value;
+      const tp = document.getElementById('filterTP').value;
+      const idMapel = document.getElementById('filterMapel').value;
+      
+      if (!kelas || !idMapel) {
+        Swal.fire('Info', 'Pilih Kelas dan Mapel terlebih dahulu', 'info');
+        return;
+      }
+      
+      if (typeof XLSX === 'undefined') {
+        Swal.fire('Error', 'Library Excel belum termuat. Silakan refresh halaman.', 'error');
+        return;
+      }
+      
+      Swal.fire({ title: 'Mempersiapkan Template Excel...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      
+      try {
+        // Ambil data yang diperlukan
+        if (siswaCache.length === 0) siswaCache = await callGAS('getSiswaData');
+        if (mapelCache.length === 0) mapelCache = await callGAS('getMapelData');
+        if (tpCache.length === 0) tpCache = await callGAS('getTPData');
+        if (!nilaiCache || nilaiCache.length === 0) nilaiCache = await callGAS('getNilaiData');
+        
+        const siswaKelas = siswaCache.filter(s => s.kelas === kelas);
+        const mapelInfo = mapelCache.find(m => String(m.id_mapel) === String(idMapel));
+        const isEkskul = mapelInfo && mapelInfo.kategori === 'Ekstrakurikuler';
+        const tpMapel = tpCache.filter(t => String(t.id_mapel) === String(idMapel));
+        
+        if (siswaKelas.length === 0) {
+          Swal.close();
+          Swal.fire('Info', 'Tidak ada siswa di kelas ini', 'info');
+          return;
+        }
+        
+        const wb = XLSX.utils.book_new();
+        const namaMapel = mapelInfo ? mapelInfo.nama_mapel : 'Mapel';
+        const semesterText = semester === '1' ? 'Ganjil' : 'Genap';
+        
+        // ====== SHEET 1: PETUNJUK ======
+        const petunjukData = [
+          ['TEMPLATE IMPORT NILAI'],
+          [namaMapel + ' - Kelas ' + kelas],
+          ['Semester ' + semesterText + ' | Tahun Pelajaran ' + tp],
+          [''],
+          ['PETUNJUK PENGISIAN:'],
+          ['1. JANGAN mengubah header (baris 1) dan kolom NISN (kolom B)'],
+          ['2. JANGAN mengubah nama siswa (kolom C) - digunakan untuk pencocokan'],
+          ['3. Isi nilai pada kolom TP-1, TP-2, dst (angka 0-100)'],
+          ['4. Untuk Ekskul: isi kolom Nilai (0-100) dan Keterangan'],
+          ['5. Kosongkan kolom yang tidak diisi'],
+          ['6. Simpan file (Ctrl+S) sebelum diupload'],
+          [''],
+          ['INFORMASI TEMPLATE:'],
+          ['Kelas          : ' + kelas],
+          ['Mata Pelajaran : ' + namaMapel],
+          ['Semester       : ' + semesterText + ' (' + semester + ')'],
+          ['Tahun Pelajaran: ' + tp],
+          ['Jumlah Siswa   : ' + siswaKelas.length],
+          ['Jumlah TP      : ' + (isEkskul ? '-' : tpMapel.length)],
+          ['Kategori       : ' + (mapelInfo ? mapelInfo.kategori : '-')],
+          [''],
+          ['DAFTAR TUJUAN PEMBELAJARAN (TP):']
+        ];
+        
+        if (!isEkskul && tpMapel.length > 0) {
+          tpMapel.forEach((tp_item, idx) => {
+            petunjukData.push(['TP-' + (idx + 1) + ': ' + tp_item.deskripsi_tp]);
+          });
+        } else if (isEkskul) {
+          petunjukData.push('(Ekstrakurikuler - hanya isi Nilai dan Keterangan)');
+        } else {
+          petunjukData.push('(Belum ada TP untuk mapel ini)');
+        }
+        
+        const wsPetunjuk = XLSX.utils.aoa_to_sheet(petunjukData);
+        wsPetunjuk['!cols'] = [{ wch: 80 }];
+        
+        // Styling judul
+        if (wsPetunjuk['A1']) {
+          wsPetunjuk['A1'].s = { font: { bold: true, sz: 16, color: { rgb: "0D6EFD" } } };
+        }
+        if (wsPetunjuk['A2']) {
+          wsPetunjuk['A2'].s = { font: { bold: true, sz: 13 } };
+        }
+        if (wsPetunjuk['A5']) {
+          wsPetunjuk['A5'].s = { font: { bold: true, sz: 12, color: { rgb: "DC3545" } } };
+        }
+        
+        XLSX.utils.book_append_sheet(wb, wsPetunjuk, 'Petunjuk');
+        
+        // ====== SHEET 2: DATA NILAI ======
+        let headerRow = [];
+        if (isEkskul) {
+          headerRow = ['NO', 'NISN', 'NAMA SISWA', 'NILAI', 'KETERANGAN'];
+        } else {
+          headerRow = ['NO', 'NISN', 'NAMA SISWA'];
+          tpMapel.forEach((tp_item, idx) => {
+            headerRow.push('TP-' + (idx + 1));
+          });
+        }
+        
+        const aoa = [headerRow];
+        
+        // Isi data siswa
+        siswaKelas.forEach((s, idx) => {
+          const row = [idx + 1, s.nisn || '', s.nama || ''];
+          
+          if (isEkskul) {
+            // Cari nilai ekskul yang sudah ada
+            const nilaiSiswa = nilaiCache.find(n => 
+              String(n.id_siswa) === String(s.id_siswa) && 
+              String(n.id_mapel) === String(idMapel) && 
+              String(n.semester) === String(semester) && 
+              String(n.tahun_pelajaran) === String(tp)
+            );
+            row.push(nilaiSiswa ? (nilaiSiswa.tp1 || '') : '');
+            row.push(nilaiSiswa ? (nilaiSiswa.keterangan_ekskul || '') : '');
+          } else {
+            // Cari nilai yang sudah ada untuk setiap TP
+            const nilaiSiswa = nilaiCache.find(n => 
+              String(n.id_siswa) === String(s.id_siswa) && 
+              String(n.id_mapel) === String(idMapel) && 
+              String(n.semester) === String(semester) && 
+              String(n.tahun_pelajaran) === String(tp)
+            );
+            tpMapel.forEach((tp_item, tpIdx) => {
+              const val = nilaiSiswa ? (nilaiSiswa['tp' + (tpIdx + 1)] || '') : '';
+              row.push(val);
+            });
+          }
+          
+          aoa.push(row);
+        });
+        
+        const wsNilai = XLSX.utils.aoa_to_sheet(aoa);
+        
+        // Styling header
+        const range = XLSX.utils.decode_range(wsNilai['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const address = XLSX.utils.encode_col(C) + "1";
+          if (!wsNilai[address]) continue;
+          wsNilai[address].s = {
+            fill: { fgColor: { rgb: "0D6EFD" } },
+            font: { bold: true, color: { rgb: "FFFFFF" }, sz: 11 },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } }
+            }
+          };
+        }
+        
+        // Set column widths
+        const cols = [
+          { wch: 5 },   // NO
+          { wch: 15 },  // NISN
+          { wch: 30 }   // NAMA
+        ];
+        
+        if (isEkskul) {
+          cols.push({ wch: 10 }); // NILAI
+          cols.push({ wch: 40 }); // KETERANGAN
+        } else {
+          tpMapel.forEach(() => cols.push({ wch: 10 }));
+        }
+        wsNilai['!cols'] = cols;
+        
+        // Freeze panes (freeze header row)
+        wsNilai['!freeze'] = { xSplit: 0, ySplit: 1 };
+        
+        XLSX.utils.book_append_sheet(wb, wsNilai, 'Input Nilai');
+        
+        // Generate filename
+        const namaMapelClean = namaMapel.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+        const fileName = `Template_Nilai_${kelas.replace(/\s+/g,'')}_Sem${semester}_${namaMapelClean}.xlsx`;
+        
+        XLSX.writeFile(wb, fileName);
+        
+        Swal.close();
+        Swal.fire({
+          icon: 'success',
+          title: 'Template Excel Berhasil Diunduh!',
+          html: `
+            <div class="text-start" style="font-size:0.9rem;">
+              <b>File:</b> ${fileName}<br>
+              <b>Jumlah Siswa:</b> ${siswaKelas.length}<br>
+              <b>Jumlah TP:</b> ${isEkskul ? '-' : tpMapel.length}<br>
+              <hr class="my-2">
+              <small class="text-muted">
+                <i class="fas fa-info-circle"></i> Template sudah berisi data siswa dan nilai yang sudah ada.<br>
+                Silakan isi nilai pada sheet <b>"Input Nilai"</b>, lalu upload kembali.
+              </small>
+            </div>
+          `,
+          timer: 5000,
+          showConfirmButton: false
+        });
+        
+      } catch (err) {
+        console.error(err);
+        Swal.close();
+        Swal.fire('Error', 'Gagal membuat template: ' + err.message, 'error');
+      }
+    }
+    
+    function showImportModal() { 
+      const kelas = document.getElementById('filterKelas').value;
+      const idMapel = document.getElementById('filterMapel').value;
+      if (!kelas || !idMapel) {
+        Swal.fire('Info', 'Pilih Kelas dan Mapel terlebih dahulu sebelum import', 'info');
+        return;
+      }
+      new bootstrap.Modal(document.getElementById('modalImport')).show(); 
+    }
+    
+    async function processImport() { 
+      const fileInput = document.getElementById('importFile'); 
+      if (!fileInput.files[0]) { 
+        Swal.fire('Info', 'Pilih file terlebih dahulu', 'info'); 
+        return; 
+      } 
+      
+      const kelas = document.getElementById('filterKelas').value;
+      const semester = document.getElementById('filterSemester').value;
+      const tp = document.getElementById('filterTP').value;
+      const idMapel = document.getElementById('filterMapel').value;
+      
+      if (!kelas || !idMapel || !tp) {
+        Swal.fire('Info', 'Lengkapi filter Kelas, Semester, Tahun Pelajaran, dan Mapel', 'info');
+        return;
+      }
+      
+      Swal.fire({ title: 'Memproses file Excel...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      
+      const file = fileInput.files[0];
+      
+      // Baca file dengan SheetJS di client
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          if (typeof XLSX === 'undefined') {
+            Swal.fire('Error', 'Library Excel tidak tersedia', 'error');
+            return;
+          }
+          
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          
+          // Cari sheet "Input Nilai" atau sheet pertama
+          let sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('input') || n.toLowerCase().includes('nilai'));
+          if (!sheetName) sheetName = wb.SheetNames[0];
+          
+          const ws = wb.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+          
+          if (jsonData.length < 2) {
+            Swal.fire('Error', 'File Excel kosong atau tidak valid', 'error');
+            return;
+          }
+          
+          // Ambil header
+          const header = jsonData[0].map(h => String(h).trim().toUpperCase());
+          
+          // Ambil data siswa dan TP untuk mapping
+          if (siswaCache.length === 0) siswaCache = await callGAS('getSiswaData');
+          if (tpCache.length === 0) tpCache = await callGAS('getTPData');
+          if (mapelCache.length === 0) mapelCache = await callGAS('getMapelData');
+          if (!nilaiCache || nilaiCache.length === 0) nilaiCache = await callGAS('getNilaiData');
+          
+          const mapelInfo = mapelCache.find(m => String(m.id_mapel) === String(idMapel));
+          const isEkskul = mapelInfo && mapelInfo.kategori === 'Ekstrakurikuler';
+          const tpMapel = tpCache.filter(t => String(t.id_mapel) === String(idMapel));
+          
+          // Cari index kolom NISN
+          let nisnIdx = header.findIndex(h => h === 'NISN');
+          if (nisnIdx === -1) nisnIdx = 1; // fallback ke kolom B
+          
+          const dataArray = [];
+          let successCount = 0;
+          let skipCount = 0;
+          
+          // Proses setiap baris data (skip header)
+          for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row || row.length === 0) continue;
+            
+            const nisn = String(row[nisnIdx] || '').trim();
+            if (!nisn) { skipCount++; continue; }
+            
+            // Cari siswa berdasarkan NISN
+            const siswa = siswaCache.find(s => String(s.nisn) === nisn && s.kelas === kelas);
+            if (!siswa) { skipCount++; continue; }
+            
+            // Cari nilai existing
+            const existingNilai = nilaiCache.find(n => 
+              String(n.id_siswa) === String(siswa.id_siswa) && 
+              String(n.id_mapel) === String(idMapel) && 
+              String(n.semester) === String(semester) && 
+              String(n.tahun_pelajaran) === String(tp)
+            );
+            
+            const dataObj = {
+              id_siswa: siswa.id_siswa,
+              id_mapel: idMapel,
+              semester: semester,
+              tahun_pelajaran: tp,
+              keterangan_ekskul: ''
+            };
+            
+            if (isEkskul) {
+              // Cari kolom NILAI dan KETERANGAN
+              const nilaiIdx = header.findIndex(h => h === 'NILAI');
+              const ketIdx = header.findIndex(h => h === 'KETERANGAN');
+              const nilaiVal = nilaiIdx >= 0 ? row[nilaiIdx] : (row[3] || '');
+              const ketVal = ketIdx >= 0 ? row[ketIdx] : (row[4] || '');
+              
+              dataObj.tp1 = nilaiVal !== '' && nilaiVal !== null && nilaiVal !== undefined ? Number(nilaiVal) : '';
+              dataObj.keterangan_ekskul = String(ketVal || '');
+            } else {
+              // Map TP-1, TP-2, dst
+              for (let tpIdx = 0; tpIdx < tpMapel.length; tpIdx++) {
+                const tpHeader = 'TP-' + (tpIdx + 1);
+                let colIdx = header.findIndex(h => h === tpHeader);
+                if (colIdx === -1) colIdx = 3 + tpIdx; // fallback
+                
+                const val = row[colIdx];
+                if (val !== '' && val !== null && val !== undefined) {
+                  const numVal = Number(val);
+                  if (!isNaN(numVal) && numVal >= 0 && numVal <= 100) {
+                    dataObj['tp' + (tpIdx + 1)] = numVal;
+                  }
+                }
+              }
+            }
+            
+            dataArray.push(dataObj);
+            successCount++;
+          }
+          
+          if (dataArray.length === 0) {
+            Swal.fire('Error', 'Tidak ada data valid yang ditemukan. Pastikan kolom NISN sesuai.', 'error');
+            return;
+          }
+          
+          // Konfirmasi sebelum simpan
+          Swal.close();
+          const confirm = await Swal.fire({
+            title: 'Konfirmasi Import',
+            html: `
+              <div class="text-start">
+                <b>File:</b> ${file.name}<br>
+                <b>Data valid:</b> ${successCount} siswa<br>
+                <b>Data dilewati:</b> ${skipCount} baris<br>
+                <hr>
+                <small class="text-muted">Data akan disimpan ke database. Lanjutkan?</small>
+              </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#198754'
+          });
+          
+          if (!confirm.isConfirmed) return;
+          
+          Swal.fire({ title: 'Menyimpan data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+          
+          const res = await callGAS('saveNilaiBatch', dataArray);
+          
+          Swal.close();
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Import Berhasil!',
+              html: `<b>${successCount}</b> data nilai berhasil diimport.`,
+              timer: 2500,
+              showConfirmButton: false
+            });
+            bootstrap.Modal.getInstance(document.getElementById('modalImport')).hide();
+            nilaiCache = []; // Reset cache untuk refresh
+            loadNilaiTable();
+          } else {
+            Swal.fire('Gagal', res.message, 'error');
+          }
+          
+        } catch (err) {
+          console.error(err);
+          Swal.close();
+          Swal.fire('Error', 'Gagal memproses file: ' + err.message, 'error');
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
     
     async function saveAllNilai() { 
       const tp = document.getElementById('filterTP').value; 
@@ -504,7 +991,7 @@
       } else { return; }
       Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
       const res = await callGAS('saveNilaiBatch', dataArray); 
-      if(res.success) { Swal.fire('Berhasil', res.message, 'success'); loadNilaiTable(); } else Swal.fire('Gagal', res.message, 'error'); 
+      if(res.success) { Swal.fire('Berhasil', res.message, 'success'); nilaiCache = []; loadNilaiTable(); } else Swal.fire('Gagal', res.message, 'error'); 
     }
 
     async function loadDeskripsiDropdown() { if(kelasCache.length===0) kelasCache = await callGAS('getKelasData'); const s = document.getElementById('descKelas'); s.innerHTML='<option value="">Pilih Kelas</option>'; kelasCache.forEach(k=>s.innerHTML+=`<option value="${k.nama_kelas}">${k.nama_kelas}</option>`); document.getElementById('descTP').value = settingsCache['Tahun Pelajaran'] || ''; }
@@ -742,26 +1229,18 @@
       });
     }
 
-    // ============ HALAMAN 3: IDENTITAS PESERTA DIDIK (UPDATED) ============
     async function renderSampulHalaman3(doc, siswa, settings) {
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const centerX = pageWidth / 2;
       const marginX = 50;
       const tableWidth = pageWidth - (marginX * 2);
-      
-      // ====== JUDUL: PESERTA DIDIK (ditengah, font besar, tanpa garis bawah) ======
       let currentY = 60;
-      
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(22);  // Font lebih besar (sebelumnya 20 untuk R A P O R)
+      doc.setFontSize(22);
       doc.text('PESERTA DIDIK', centerX, currentY, { align: 'center' });
-      
-      // Jarak 1 cm (~28 pt) antara judul dan tabel identitas
-      currentY += 40;  // 22 (font) + 18 (jarak tambahan ~1cm)
-      
-      // ====== TABEL IDENTITAS SISWA (langsung tanpa header Nama/NISN terpisah) ======
+      currentY += 40;
       const identitasRows = [
         ['Nama Peserta Didik', ': ' + (siswa.nama || '-')],
         ['NISN / NIS', ': ' + (siswa.nisn || '-') + ' / ' + (siswa.nis || '-')],
@@ -771,7 +1250,6 @@
         ['Pendidikan sebelumnya', ': ' + (siswa.pendidikan_sebelumnya || '-')],
         ['Alamat Peserta Didik', ': ' + (siswa.alamat_siswa || '-')]
       ];
-      
       doc.autoTable({
         body: identitasRows,
         startY: currentY,
@@ -784,15 +1262,11 @@
           1: { cellWidth: 'auto', halign: 'left' }
         }
       });
-      
       currentY = doc.lastAutoTable.finalY + 15;
-      
-      // ====== IDENTITAS ORANG TUA ======
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text('IDENTITAS ORANG TUA', marginX, currentY);
       currentY += 15;
-      
       const ortuRows = [
         ['Nama Orang Tua', ''],
         ['   Ayah', ': ' + (siswa.nama_ayah || '-')],
@@ -803,7 +1277,6 @@
         ['Alamat Orang Tua', ''],
         ['   Jalan', ': ' + (siswa.alamat_orang_tua || '-')]
       ];
-      
       doc.autoTable({
         body: ortuRows, startY: currentY, theme: 'plain',
         margin: { left: marginX, right: marginX }, tableWidth: tableWidth,
@@ -815,46 +1288,34 @@
           }
         }
       });
-      
       currentY = doc.lastAutoTable.finalY + 15;
-      
-      // ====== WALI PESERTA DIDIK ======
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text('WALI PESERTA DIDIK', marginX, currentY);
       currentY += 15;
-      
       const waliRows = [
         ['Nama', ': ' + (siswa.nama_wali || '-')],
         ['Pekerjaan', ': ' + (siswa.pekerjaan_wali || '-')],
         ['Alamat', ': ' + (siswa.alamat_wali || '-')]
       ];
-      
       doc.autoTable({
         body: waliRows, startY: currentY, theme: 'plain',
         margin: { left: marginX, right: marginX }, tableWidth: tableWidth,
         styles: { fontSize: 11, cellPadding: 3, textColor: [30, 30, 30], lineWidth: 0 },
         columnStyles: { 0: { cellWidth: 170, fontStyle: 'normal', halign: 'left' }, 1: { cellWidth: 'auto', halign: 'left' } }
       });
-      
       currentY = doc.lastAutoTable.finalY + 35;
-      
-      // ====== TANDA TANGAN KEPALA SEKOLAH ======
       const kota = settings['Kota Tanda Tangan'] || '';
       const tanggal = formatTanggal(new Date().toISOString().split('T')[0]);
       const kepsek = settings['Nama Kepala Sekolah'] || '';
       const nipKepsek = settings['NIP Kepala Sekolah'] || '';
-      
       const signX = pageWidth - marginX - 220;
-      
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
       doc.text(kota + ', ' + tanggal, signX + 110, currentY, { align: 'center' });
       currentY += 15;
       doc.text('Kepala Sekolah,', signX + 110, currentY, { align: 'center' });
-      
       currentY += 65;
-      
       doc.setFont('helvetica', 'bold');
       doc.text(kepsek || '', signX + 110, currentY, { align: 'center' });
       currentY += 14;
@@ -1140,3 +1601,5 @@
 </body>
 </html>
 
+   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+   
